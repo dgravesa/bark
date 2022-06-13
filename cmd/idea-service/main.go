@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"cloud.google.com/go/datastore"
@@ -16,9 +17,14 @@ import (
 
 const projectName = "ItsTheCloudForYourCloud"
 
-var r *chi.Mux
+var (
+	r      *chi.Mux
+	logger *log.Logger
+)
 
 func init() {
+	logger = log.New(os.Stdout, "", log.LstdFlags)
+
 	r = chi.NewRouter()
 
 	// initialize middlewares
@@ -37,6 +43,7 @@ func init() {
 		IdeaStore: &bark.IdeaDatastore{
 			DatastoreClient: datastoreClient,
 		},
+		Logger: logger,
 	}
 
 	service.RegisterRoutes(r)
@@ -47,6 +54,6 @@ func main() {
 	flag.Parse()
 
 	addr := fmt.Sprintf(":%d", *portNum)
-	log.Printf("listening on port %d...", *portNum)
+	logger.Printf("listen_port=%d", *portNum)
 	http.ListenAndServe(addr, r)
 }
