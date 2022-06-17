@@ -23,7 +23,7 @@ var (
 )
 
 func init() {
-	logger = log.New(os.Stdout, "", log.LstdFlags)
+	logger = log.New(os.Stdout, "", log.LstdFlags|log.Llongfile)
 
 	r = chi.NewRouter()
 
@@ -37,7 +37,7 @@ func init() {
 	// initialize service
 	datastoreClient, err := datastore.NewClient(context.Background(), projectName)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 	service := IdeaService{
 		IdeaStore: &bark.IdeaDatastore{
