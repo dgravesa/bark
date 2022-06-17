@@ -9,13 +9,13 @@ import (
 	"os"
 	"time"
 
-	"cloud.google.com/go/datastore"
+	"cloud.google.com/go/firestore"
 	"github.com/dgravesa/bark/pkg/bark"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-const projectName = "ItsTheCloudForYourCloud"
+const projectID = "itsthecloudforyourcloud"
 
 var (
 	r      *chi.Mux
@@ -35,13 +35,13 @@ func init() {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	// initialize service
-	datastoreClient, err := datastore.NewClient(context.Background(), projectName)
+	firestoreClient, err := firestore.NewClient(context.Background(), projectID)
 	if err != nil {
 		logger.Fatal(err)
 	}
 	service := IdeaService{
-		IdeaStore: &bark.IdeaDatastore{
-			DatastoreClient: datastoreClient,
+		IdeaStore: &bark.IdeaFirestore{
+			FirestoreClient: firestoreClient,
 		},
 		Logger: logger,
 	}

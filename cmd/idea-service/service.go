@@ -8,11 +8,12 @@ import (
 	"net/http"
 	"time"
 
-	"cloud.google.com/go/datastore"
 	"github.com/dgravesa/bark/pkg/bark"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/google/uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 const maxIdeaBytes = 20000
@@ -60,11 +61,11 @@ func (service *IdeaService) GetIdea(w http.ResponseWriter, r *http.Request) {
 	service.logf(r, "request=get_idea idea_id=%s", id)
 
 	idea, err := service.IdeaStore.Get(r.Context(), id)
-	switch err {
-	case nil:
+	switch status.Code(err) {
+	case codes.OK:
 		service.logf(r, "idea_id=%s result=get_success", id)
 		respondSuccess(w, http.StatusOK, idea)
-	case datastore.ErrNoSuchEntity:
+	case codes.NotFound:
 		service.logf(r, "idea_id=%s result=not_found_error", id)
 		respondError(w, http.StatusNotFound, fmt.Sprint("idea not found with ID: ", id))
 	default:
@@ -74,7 +75,7 @@ func (service *IdeaService) GetIdea(w http.ResponseWriter, r *http.Request) {
 }
 
 type newIdeaRequest struct {
-	Text string `json:"idea"`
+	Text string `json:"text"`
 }
 
 // PostIdea is the handler for creating a new idea.
@@ -82,10 +83,7 @@ func (service *IdeaService) PostIdea(w http.ResponseWriter, r *http.Request) {
 	var requestBody newIdeaRequest
 
 	r.Body = http.MaxBytesReader(w, r.Body, maxIdeaBytes)
-
-	rd := http.MaxBytesReader(w, r.Body, maxIdeaBytes)
-	d := json.NewDecoder(rd)
-	err := d.Decode(&requestBody)
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
 		service.logf(r, `result=decode_error error_text="%s"`, err)
 		respondError(w, http.StatusBadRequest, "could not read idea text")
