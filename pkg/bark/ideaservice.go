@@ -31,8 +31,15 @@ func (service *IdeaService) logf(r *http.Request, format string, v ...interface{
 		if requestID == "" {
 			requestID = "???"
 		}
-		fullFormat := fmt.Sprintf("request_id=%s %s", requestID, format)
-		service.Logger.Printf(fullFormat, v...)
+
+		if format == "" {
+			service.Logger.Printf("request_id=%s method=%s endpoint=%s",
+				requestID, r.Method, r.URL.EscapedPath())
+		} else {
+			fullFormat := fmt.Sprintf("request_id=%s method=%s endpoint=%s %s",
+				requestID, r.Method, r.URL.EscapedPath(), format)
+			service.Logger.Printf(fullFormat, v...)
+		}
 	}
 }
 
@@ -40,6 +47,7 @@ func (service *IdeaService) logf(r *http.Request, format string, v ...interface{
 type IdeaStore interface {
 	Get(ctx context.Context, ID string) (*Idea, error)
 	Put(ctx context.Context, idea *Idea) error
+	Delete(ctx context.Context, ID string) error
 }
 
 // RegisterRoutes registers the idea service routes to the chi router.
@@ -49,6 +57,7 @@ func (service *IdeaService) RegisterRoutes(r *chi.Mux) {
 
 		r.Route("/{ideaID}", func(r chi.Router) {
 			r.Get("/", service.GetIdea)
+			r.Delete("/", service.DeleteIdea)
 		})
 	})
 }
@@ -57,12 +66,10 @@ func (service *IdeaService) RegisterRoutes(r *chi.Mux) {
 func (service *IdeaService) GetIdea(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "ideaID")
 
-	service.logf(r, "request=get_idea idea_id=%s", id)
-
 	idea, err := service.IdeaStore.Get(r.Context(), id)
 	switch status.Code(err) {
 	case codes.OK:
-		service.logf(r, "idea_id=%s result=get_success", id)
+		service.logf(r, "idea_id=%s result=ok", id)
 		respondSuccess(w, http.StatusOK, idea)
 	case codes.NotFound:
 		service.logf(r, "idea_id=%s result=not_found_error", id)
@@ -109,6 +116,21 @@ func (service *IdeaService) PostIdea(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	service.logf(r, "idea_id=%s result=post_success", idea.ID)
+	service.logf(r, "idea_id=%s result=ok", idea.ID)
 	respondSuccess(w, http.StatusCreated, idea)
+}
+
+// DeleteIdea is the handler for deleting an idea.
+func (service *IdeaService) DeleteIdea(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "ideaID")
+
+	err := service.IdeaStore.Delete(r.Context(), id)
+	switch status.Code(err) {
+	case codes.OK:
+		service.logf(r, "idea_id=%s result=ok", id)
+		respondSuccess(w, http.StatusNoContent, nil)
+	default:
+		service.logf(r, `idea_id=%s result=internal_error error_text="%s"`, id, err)
+		respondError(w, http.StatusInternalServerError, "internal error occurred")
+	}
 }

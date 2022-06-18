@@ -32,3 +32,10 @@ func (store *IdeaFirestore) Put(ctx context.Context, idea *Idea) error {
 	_, err := store.FirestoreClient.Doc(docID).Create(ctx, idea)
 	return err
 }
+
+// Delete deletes an idea.
+func (store *IdeaFirestore) Delete(ctx context.Context, ID string) error {
+	docID := "idea/" + ID
+	_, err := store.FirestoreClient.Doc(docID).Delete(ctx)
+	return err
+}
