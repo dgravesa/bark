@@ -1,4 +1,4 @@
-package main
+package bark
 
 import (
 	"encoding/json"

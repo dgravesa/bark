@@ -1,4 +1,4 @@
-package main
+package bark
 
 import (
 	"context"
@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dgravesa/bark/pkg/bark"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/google/uuid"
@@ -39,8 +38,8 @@ func (service *IdeaService) logf(r *http.Request, format string, v ...interface{
 
 // IdeaStore is a data interface to all ideas.
 type IdeaStore interface {
-	Get(ctx context.Context, ID string) (*bark.Idea, error)
-	Put(ctx context.Context, idea *bark.Idea) error
+	Get(ctx context.Context, ID string) (*Idea, error)
+	Put(ctx context.Context, idea *Idea) error
 }
 
 // RegisterRoutes registers the idea service routes to the chi router.
@@ -94,7 +93,7 @@ func (service *IdeaService) PostIdea(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idea := &bark.Idea{
+	idea := &Idea{
 		ID:           uuid.NewString(),
 		Text:         requestBody.Text,
 		CreationTime: time.Now(),

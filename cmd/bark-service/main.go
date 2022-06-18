@@ -39,7 +39,7 @@ func init() {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	service := IdeaService{
+	service := bark.IdeaService{
 		IdeaStore: &bark.IdeaFirestore{
 			FirestoreClient: firestoreClient,
 		},
