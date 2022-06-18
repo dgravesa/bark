@@ -23,7 +23,7 @@ var (
 )
 
 func init() {
-	logger = log.New(os.Stdout, "", log.LstdFlags|log.Llongfile)
+	logger = log.New(os.Stdout, "", log.LstdFlags)
 
 	r = chi.NewRouter()
 
@@ -54,6 +54,6 @@ func main() {
 	flag.Parse()
 
 	addr := fmt.Sprintf(":%d", *portNum)
-	logger.Printf("listen_port=%d", *portNum)
+	logger.Printf("listenPort=%d", *portNum)
 	http.ListenAndServe(addr, r)
 }
