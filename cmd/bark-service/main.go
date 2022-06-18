@@ -50,7 +50,7 @@ func init() {
 }
 
 func main() {
-	portNum := flag.Int("port", 8345, "port to listen on")
+	portNum := flag.Int("port", 8080, "port to listen on")
 	flag.Parse()
 
 	addr := fmt.Sprintf(":%d", *portNum)
