@@ -9,7 +9,8 @@ type errorType struct {
 	Text string `json:"errorText"`
 }
 
-func respondError(w http.ResponseWriter, code int, errorText string) {
+// RespondError is a helper to respond with a standard JSON error response.
+func RespondError(w http.ResponseWriter, code int, errorText string) {
 	e := errorType{
 		Text: errorText,
 	}
@@ -19,7 +20,8 @@ func respondError(w http.ResponseWriter, code int, errorText string) {
 	w.Write(b)
 }
 
-func respondSuccess(w http.ResponseWriter, code int, v interface{}) {
+// RespondSuccess is a helper to respond with a successful JSON response.
+func RespondSuccess(w http.ResponseWriter, code int, v interface{}) {
 	b, _ := json.Marshal(v)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)

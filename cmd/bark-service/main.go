@@ -40,10 +40,13 @@ func init() {
 		logger.Fatal(err)
 	}
 	service := bark.IdeaService{
+		Service: bark.Service{
+			Name:   "bark-ideas",
+			Logger: logger,
+		},
 		IdeaStore: &bark.IdeaFirestore{
 			FirestoreClient: firestoreClient,
 		},
-		Logger: logger,
 	}
 
 	service.RegisterRoutes(r)
