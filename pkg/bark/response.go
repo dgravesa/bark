@@ -22,8 +22,7 @@ func RespondError(w http.ResponseWriter, code int, errorText string) {
 
 // RespondSuccess is a helper to respond with a successful JSON response.
 func RespondSuccess(w http.ResponseWriter, code int, v interface{}) {
-	b, _ := json.Marshal(v)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(b)
+	json.NewEncoder(w).Encode(v)
 }

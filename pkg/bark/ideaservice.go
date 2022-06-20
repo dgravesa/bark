@@ -19,11 +19,14 @@ const maxIdeaBytes = 20000
 // IdeaService contains handlers for the idea service endpoints.
 type IdeaService struct {
 	Service
-	IdeaStore interface {
-		Get(ctx context.Context, ID string) (*Idea, error)
-		Put(ctx context.Context, idea *Idea) error
-		Delete(ctx context.Context, ID string) error
-	}
+	IdeaStore IdeaStore
+}
+
+// IdeaStore is an interface to a data store for ideas.
+type IdeaStore interface {
+	Get(ctx context.Context, ID string) (*Idea, error)
+	Put(ctx context.Context, idea *Idea) error
+	Delete(ctx context.Context, ID string) error
 }
 
 // RegisterRoutes registers the idea service routes to the chi router.
@@ -56,13 +59,14 @@ func (service *IdeaService) GetIdea(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type newIdeaRequest struct {
+// NewIdeaRequest is the request type for a new idea.
+type NewIdeaRequest struct {
 	Text string `json:"text"`
 }
 
 // PostIdea is the handler for creating a new idea.
 func (service *IdeaService) PostIdea(w http.ResponseWriter, r *http.Request) {
-	var requestBody newIdeaRequest
+	var requestBody NewIdeaRequest
 
 	r.Body = http.MaxBytesReader(w, r.Body, maxIdeaBytes)
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
