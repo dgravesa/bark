@@ -28,8 +28,14 @@ type DoggoStore interface {
 // Register registers a dog by initializing its task and putting it in the data store.
 // WARNING: on success, this method modifies the dog argument's NextTask fields.
 func (w Whisperer) Register(ctx context.Context, dog *Dog) (*Dog, error) {
+	// determine first scheduled time
+	schedule, err := dog.Schedule()
+	if err != nil {
+		return nil, err
+	}
+	scheduleTime := schedule.Next(time.Now())
+
 	// create task
-	scheduleTime := dog.Schedule.Next(time.Now())
 	task, err := w.TaskClient.CreateTask(ctx, &tasks.CreateTaskRequest{
 		Parent: w.QueueName,
 		Task: &tasks.Task{

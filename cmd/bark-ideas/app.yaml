@@ -1,0 +1,7 @@
+runtime: go116
+
+service: bark-ideas
+
+main: ./cmd/bark-ideas
+
+service_account: bark-ideas@itsthecloudforyourcloud.iam.gserviceaccount.com

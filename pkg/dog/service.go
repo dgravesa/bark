@@ -73,7 +73,7 @@ func (service *Service) PostDog(w http.ResponseWriter, r *http.Request) {
 	}
 	ideaID := requestBody.IdeaID
 
-	schedule, err := ParseSchedule(requestBody.ScheduleType, requestBody.Schedule)
+	_, err = ParseSchedule(requestBody.ScheduleType, requestBody.Schedule)
 	if err != nil {
 		service.Logf(r, `result=ParseScheduleError errorText="%s"`, err)
 		bark.RespondError(w, http.StatusBadRequest, err.Error())
@@ -102,7 +102,7 @@ func (service *Service) PostDog(w http.ResponseWriter, r *http.Request) {
 		CreationTime: time.Now(),
 		IdeaID:       ideaID,
 		ScheduleType: requestBody.ScheduleType,
-		Schedule:     schedule,
+		ScheduleRaw:  requestBody.Schedule,
 	}
 
 	dog, err = service.TasksClient.Register(r.Context(), dog)

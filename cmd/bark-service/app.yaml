@@ -1,9 +1,0 @@
-runtime: go116
-
-main: ./cmd/bark-service
-
-service_account: bark-ideas@itsthecloudforyourcloud.iam.gserviceaccount.com
-
-handlers:
-- url: /*
-  script: auto

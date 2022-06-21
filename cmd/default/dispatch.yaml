@@ -1,0 +1,6 @@
+dispatch:
+  - url: "*/ideas*"
+    service: bark-ideas
+
+  - url: "*/dogs*"
+    service: bark-dogs

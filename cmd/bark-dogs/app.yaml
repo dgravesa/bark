@@ -1,0 +1,10 @@
+runtime: go116
+
+service: bark-dogs
+
+main: ./cmd/bark-dogs
+
+service_account: bark-dogs@itsthecloudforyourcloud.iam.gserviceaccount.com
+
+env_variables:
+  QUEUE_NAME: projects/itsthecloudforyourcloud/locations/us-east1/queues/barks
